@@ -1,7 +1,7 @@
 // app/page.tsx
 
 import { getJobs } from "@/lib/api";
-import JobCard from "@/components/JobCard";
+import JobSearch from "@/components/JobSearch";
 
 export default async function HomePage() {
   const jobs = await getJobs(50);
@@ -20,17 +20,9 @@ export default async function HomePage() {
         </div>
       </header>
 
-      {/* Job listing */}
+      {/* Búsqueda y listado */}
       <section className="max-w-5xl mx-auto px-4 py-6">
-        <p className="text-sm text-gray-400 mb-4">
-          {jobs.length} empleos encontrados
-        </p>
-
-        <div className="grid gap-4 md:grid-cols-2">
-          {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
-          ))}
-        </div>
+        <JobSearch jobs={jobs} />
       </section>
     </main>
   );
