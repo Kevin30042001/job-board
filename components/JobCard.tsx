@@ -1,9 +1,11 @@
 // components/JobCard.tsx
 
+"use client";
+
 import { Job } from "@/types/job";
 import Link from "next/link";
+import { useFavorites } from "./FavoritesContext";
 
-// Función auxiliar para calcular hace cuánto se publicó
 function timeAgo(dateString: string): string {
   const now = new Date();
   const published = new Date(dateString);
@@ -18,12 +20,31 @@ function timeAgo(dateString: string): string {
   return `Hace ${diffMonths} meses`;
 }
 
+interface JobCardProps {
+  job: Job;
+}
+
 export default function JobCard({ job }: JobCardProps) {
+  const { toggleFavorite, isFavorite } = useFavorites();
+  const saved = isFavorite(job.id);
+
   return (
-    <Link href={`/jobs/${job.id}`}>
-      <div className="border border-gray-200 rounded-lg p-5 hover:border-blue-400 hover:shadow-md transition-all cursor-pointer bg-white">
+    <div className="border border-gray-200 rounded-lg p-5 hover:border-blue-400 hover:shadow-md transition-all bg-white relative">
+      {/* Botón de favorito */}
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          toggleFavorite(job.id);
+        }}
+        className="absolute top-3 right-3 text-xl cursor-pointer hover:scale-110 transition-transform"
+        title={saved ? "Quitar de favoritos" : "Guardar en favoritos"}
+      >
+        {saved ? "★" : "☆"}
+      </button>
+
+      <Link href={`/jobs/${job.id}`}>
         {/* Header: logo + empresa */}
-        <div className="flex items-start gap-4 mb-3">
+        <div className="flex items-start gap-4 mb-3 pr-8">
           {job.company_logo ? (
             <img
               src={job.company_logo}
@@ -43,7 +64,7 @@ export default function JobCard({ job }: JobCardProps) {
           </div>
         </div>
 
-        {/* Tags: tipo de trabajo, ubicación, salario */}
+        {/* Tags */}
         <div className="flex flex-wrap gap-2 mb-3">
           <span className="text-xs px-2.5 py-1 rounded-full bg-blue-50 text-blue-700">
             {job.job_type}
@@ -60,16 +81,12 @@ export default function JobCard({ job }: JobCardProps) {
           )}
         </div>
 
-        {/* Footer: categoría + fecha */}
+        {/* Footer */}
         <div className="flex justify-between items-center text-xs text-gray-400">
           <span>{job.category}</span>
           <span>{timeAgo(job.publication_date)}</span>
         </div>
-      </div>
-    </Link>
+      </Link>
+    </div>
   );
-}
-
-interface JobCardProps {
-  job: Job;
 }
